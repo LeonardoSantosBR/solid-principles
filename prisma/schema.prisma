@@ -1,0 +1,50 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model avails {
+  id            Int      @id
+  program_id    Int
+  title         String?  @db.VarChar(45)
+  description   String?  @db.VarChar(45)
+  is_executable Int?     @db.TinyInt
+  programs      programs @relation(fields: [program_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_avails_programs1")
+
+  @@index([program_id], map: "fk_avails_programs1_idx")
+}
+
+model programs {
+  id          Int       @id @default(autoincrement())
+  user_id     Int
+  title       String    @db.VarChar(255)
+  description String?   @db.VarChar(200)
+  created_at  DateTime? @db.DateTime(1)
+  updated_at  DateTime? @db.DateTime(1)
+  deleted_at  DateTime? @db.DateTime(1)
+  avails      avails[]
+  users       users     @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_programs_users")
+
+  @@index([user_id], map: "fk_programs_users_idx")
+}
+
+model users {
+  id         Int        @id @default(autoincrement())
+  email      String     @unique(map: "email_UNIQUE") @db.VarChar(255)
+  password   String?    @db.VarChar(200)
+  name       String?    @db.VarChar(255)
+  sex        users_sex?
+  created_at DateTime?  @db.DateTime(1)
+  updated_at DateTime?  @db.DateTime(1)
+  deleted_at DateTime?  @db.DateTime(1)
+  programs   programs[]
+}
+
+enum users_sex {
+  male
+  female
+}
