@@ -1,2 +1,2 @@
-export * from './filters'
-export * from './paginationHelper'
+export * from './filters';
+export * from './paginationHelper';

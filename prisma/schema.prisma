@@ -10,6 +10,8 @@ datasource db {
 model Clients {
   id          Int        @id @default(autoincrement())
   name        String     @db.VarChar(50)
+  email       String     @unique
+  password    String
   document    String     @db.VarChar(50) //CPF OR CNPJ
   phone       String?
   client_type ClientType
@@ -30,7 +32,7 @@ model Material {
   created_at  DateTime?        @default(now())
   updated_at  DateTime?
   deleted_at  DateTime?
-  client      Clients           @relation(fields: [id_client], references: [id])
+  client      Clients          @relation(fields: [id_client], references: [id])
   category    MaterialCategory @relation(fields: [id_category], references: [id])
   tags        MaterialTags[]
 
