@@ -7,44 +7,60 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model avails {
-  id            Int      @id
-  program_id    Int
-  title         String?  @db.VarChar(45)
-  description   String?  @db.VarChar(45)
-  is_executable Int?     @db.TinyInt
-  programs      programs @relation(fields: [program_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_avails_programs1")
+model Clients {
+  id          Int        @id @default(autoincrement())
+  name        String     @db.VarChar(50)
+  document    String     @db.VarChar(50) //CPF OR CNPJ
+  phone       String?
+  client_type ClientType
+  created_at  DateTime?  @default(now())
+  updated_at  DateTime?
+  deleted_at  DateTime?
+  materials   Material[]
 
-  @@index([program_id], map: "fk_avails_programs1_idx")
+  @@map("clients")
 }
 
-model programs {
-  id          Int       @id @default(autoincrement())
-  user_id     Int
-  title       String    @db.VarChar(255)
-  description String?   @db.VarChar(200)
-  created_at  DateTime? @db.DateTime(1)
-  updated_at  DateTime? @db.DateTime(1)
-  deleted_at  DateTime? @db.DateTime(1)
-  avails      avails[]
-  users       users     @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_programs_users")
+model Material {
+  id          Int              @id @default(autoincrement())
+  name        String           @db.VarChar(50)
+  description String           @db.LongText()
+  id_client   Int
+  id_category Int
+  created_at  DateTime?        @default(now())
+  updated_at  DateTime?
+  deleted_at  DateTime?
+  client      Clients           @relation(fields: [id_client], references: [id])
+  category    MaterialCategory @relation(fields: [id_category], references: [id])
+  tags        MaterialTags[]
 
-  @@index([user_id], map: "fk_programs_users_idx")
+  @@map("material")
 }
 
-model users {
+model MaterialCategory {
   id         Int        @id @default(autoincrement())
-  email      String     @unique(map: "email_UNIQUE") @db.VarChar(255)
-  password   String?    @db.VarChar(200)
-  name       String?    @db.VarChar(255)
-  sex        users_sex?
-  created_at DateTime?  @db.DateTime(1)
-  updated_at DateTime?  @db.DateTime(1)
-  deleted_at DateTime?  @db.DateTime(1)
-  programs   programs[]
+  name       String     @db.VarChar(50)
+  created_at DateTime?  @default(now())
+  updated_at DateTime?
+  deleted_at DateTime?
+  Material   Material[]
+
+  @@map("material_category")
 }
 
-enum users_sex {
-  male
-  female
+model MaterialTags {
+  id          Int       @id @default(autoincrement())
+  id_material Int
+  tag         String    @db.VarChar(50)
+  created_at  DateTime? @default(now())
+  updated_at  DateTime?
+  deleted_at  DateTime?
+  material    Material  @relation(fields: [id_material], references: [id])
+
+  @@map("material_tags")
+}
+
+enum ClientType {
+  PF
+  PJ
 }
